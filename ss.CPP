@@ -518,37 +518,39 @@ bool ss::is_empty()
 
 void ss::display_ss()
 {
-	/*need to overload couot operator or will get error */
-	
-	
-	setfill(' ');
-	
-	
-	blockptr temp;
-    temp=blockhead;
-    cout<<endl;
-    cout<<"-----------------------------------------------------"<<endl;
-    while(temp!=NULL)
-    {
-    	for(int x=0; x <19 ;x++)
-    	{
-    		if(temp->zip[x] != 0)
-			{
-    			cout<<setw(6)<<temp->zip[x]
-				<<setw(20)<<temp->placename[x]
-				<<setw(10)<<temp->state[x]
-				<<setw(15)<<temp->county[x]
-				<<setw(10)<<temp->latitude[x]
-				<<setw(10)<<temp->longitude[x]<<endl;
-			}
-			else
-			{
-				
-			}
+	ifstream infile;
+	infile.open("SequenceSet.txt");
+	bool end = false;
+	string infilestring;
+	cout<<endl<<"-----------------------------------------------------------------------------------------------"<<endl<<endl;
+
+	while(end!=true)
+	{
+		
+		getline(infile, infilestring);
+		if(infilestring == "~")
+		{
+			cout<<endl<<"-----------------------------------------------------------------------------------------------"<<endl<<endl;
+
 		}
-		cout<<endl<<endl;
-      temp=temp->next;
-    }
+		else
+		{
+			cout<<infilestring<<endl;
+		}
+		
+		if(infile.eof())
+		{
+			end = true;
+			break;
+		}
+		
+		
+		
+		
+		
+	}
+	
+	infile.close();
 }
 
 void ss::displayfield()
@@ -747,55 +749,84 @@ void ss::createindex()
 	outindex.close();
 }
 
-void ss::work()
+void ss::createSS()
 {
 	ss s;
 	ifstream file;
 	ofstream outfile;
-	outfile.open("ssout.txt");
+	outfile.open("SequenceSet.txt");
 	string line;
 	file.open("ss.txt");
-	bool end=false;
+	bool end = false;
 		
-		blockptr temp= new block;	
-		
-		blockhead=temp;
-		blockhead->next=NULL;
-		blockhead->prev=NULL;
-		temp=NULL;
-		current=blockhead;
-		for(int k = 0; k<blocksize;k++)//fill block head position
+	blockptr temp= new block;	
+	
+	blockhead=temp;
+	blockhead->next=NULL;
+	blockhead->prev=NULL;
+	temp=NULL;
+	current=blockhead;	
+	
+	while(end != true)//create a new block and read in data
+	{	
+		for(int k = 0; k <= blocksize;k++)
 		{
-			if(k<=15)
-			{
-				getline(file,line);	
-				buffer(line,current,k);
-			}
-			else
-			{
+			if(k<=blocksize-6)
+			{	//load first part of bloack into file
+				getline(file,line);
+				outfile <<line<<endl;	
 				
-				addzip(0,k,current);
-				addplace("",k,current);
-				addstate("",k,current);
-				addcounty("",k,current);
-				addlat(0,k,current);
-				addlong(0,k,current);
 			}	
+			else if(k == blocksize-1)
+			{
+				outfile<<"~"<<endl;
+		
+			}
+		}
+		if(file.eof())
+		{
+			end = true;
 		}
 		
-	while(end != true)//create a new block and read in data
-	{
+	}
+
 	
-		temp = new block;
-		temp->prev=current;
-		current->next=temp;
-		current=temp;
+	
+	outfile.close();
+	file.close();
+}
+
+void ss::load(int blockposition)
+{
+	ss s;
+	ifstream file;
+	file.open("SequenceSet.txt");
+	string line;
+	
 		
-		current->next=NULL;
+	blockptr temp= new block;	
+	
+	blockhead=temp;
+	blockhead->next=NULL;
+	blockhead->prev=NULL;
+	temp=NULL;
+	current=blockhead;	
+	
+	for(int i = 0; i<=5; i++)//create a new block and read in data
+	{
+		if(i>0)
+		{
+			temp = new block;
+			temp->prev=current;
+			current->next=temp;
+			current=temp;
+			current->next=NULL;
+		}
+		
 	
 		for(int j = 0; j<blocksize; j++)
 		{
-			if(j<15)
+			if(j<=blocksize-6)
 			{
 			getline(file,line);	
 			buffer(line,current,j);
@@ -812,19 +843,11 @@ void ss::work()
 			
 
 		}
-
-		
-		if(file.eof())
-		{
-			end = true;
-		}
-		
 		
 	}
 	
-	outfile.close();
-	file.close();
 }
+
 
 void ss::buffer(string itext, blockptr thisone,int spot){
 	

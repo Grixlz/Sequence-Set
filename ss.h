@@ -5,7 +5,7 @@
 using namespace std;
 class ss{
 	private:
-		static const int blocksize = 19;
+		static const int blocksize = 50;
 		struct block
 		{
 			block* next;
@@ -33,7 +33,8 @@ class ss{
 	bool is_empty();
 	void insert();	//find the area for insertion and add
 	void del(); // search for record and set the arrays in that location to 0
-	void work();
+	void createSS();
+	void load(int blockposition);
 	void buffer(string, blockptr, int);
 	void addzip(int, int, blockptr);
 	void addplace(string, int, blockptr);
